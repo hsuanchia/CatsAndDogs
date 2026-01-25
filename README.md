@@ -21,16 +21,16 @@ CatsAndDogs/
 └── README.md
 ```
 # Demo
-* Result \
+* Result  
 <img src="./figures/SimpleCNN_30ep_result.png" width="150">
 
-* Confusion matrix \
+* Confusion matrix 
 <img src="./figures/SimpleCNN_30ep_cnf_mat.png" width="200">
 
-* ROC curve \
+* ROC curve 
 <img src="./figures/SimpleCNN_30ep_roc_curve.png" width="300">
 
-* Labeling tools \
+* Labeling tools 
 <img src="./figures/Labeling_tools.png" width="300">
 # Package version
 ```bash
