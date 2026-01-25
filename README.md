@@ -22,13 +22,16 @@ CatsAndDogs/
 ```
 # Demo
 * Result \
-![Result](./figures/SimpleCNN_30ep_result.png)
+<img src="./figures/SimpleCNN_30ep_result.png" width="150">
+
 * Confusion matrix \
-![Result](./figures/SimpleCNN_30ep_cnf_mat.png)
+<img src="./figures/SimpleCNN_30ep_cnf_mat.png" width="200">
+
 * ROC curve \
-![Result](./figures/SimpleCNN_30ep_roc_curve.png)
+<img src="./figures/SimpleCNN_30ep_roc_curve.png" width="300">
+
 * Labeling tools \
-![Labeling tools demo](./figures/Labeling_tools.png)
+<img src="./figures/Labeling_tools.png" width="300">
 # Package version
 ```bash
 python==3.8
