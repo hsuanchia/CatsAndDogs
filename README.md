@@ -1,12 +1,14 @@
 # Cats And Dogs classification
 # Dataset
 * [Kaggle public dataset](https://www.kaggle.com/competitions/dogs-vs-cats/data)
-* test1 dataset has no corresponding label, so I labeling the test1 dataset by myself, labeling result save in test1_label.csv
+* test1 dataset has no corresponding label, so I labeling the test1 dataset by myself, labeling result saved in test1_label.csv
 # Run codes
 # Codes
 ```text
 CatsAndDogs/
-├── models/                 # File save trained models
+├── dogs-vs-cats/           # Folder containing dataset
+|
+├── models/                 # Folder save trained models
 |
 ├── data_preprocess.py      # Data preprocessing
 |
