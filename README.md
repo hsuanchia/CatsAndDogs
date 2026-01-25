@@ -21,7 +21,14 @@ CatsAndDogs/
 └── README.md
 ```
 # Demo
-
+* Result \
+![Result](./figures/SimpleCNN_30ep_result.png)
+* Confusion matrix
+![Result](./figures/SimpleCNN_30ep_cnf_mat.png)
+* ROC curve
+![Result](./figures/SimpleCNN_30ep_roc_curve.png)
+* Labeling tools
+![Labeling tools demo](./figures/Labeling_tools.png)
 # Package version
 ```bash
 python==3.8
