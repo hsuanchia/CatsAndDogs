@@ -23,11 +23,11 @@ CatsAndDogs/
 # Demo
 * Result \
 ![Result](./figures/SimpleCNN_30ep_result.png)
-* Confusion matrix
+* Confusion matrix \
 ![Result](./figures/SimpleCNN_30ep_cnf_mat.png)
-* ROC curve
+* ROC curve \
 ![Result](./figures/SimpleCNN_30ep_roc_curve.png)
-* Labeling tools
+* Labeling tools \
 ![Labeling tools demo](./figures/Labeling_tools.png)
 # Package version
 ```bash
