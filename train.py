@@ -1,5 +1,4 @@
-import torch, logging, os
-
+import torch, os, argparse
 from tqdm import tqdm
 from PIL import Image
 from torchvision import transforms
@@ -8,42 +7,42 @@ from rich.progress import Progress, TextColumn, BarColumn, TimeElapsedColumn, Ti
 from model import SimpleCNN
 from data_preprocess import data_split
 
-
 # Variebles
 EPOCHS = 1000
 LEARNING_RATE = 1e-4
-LOSS = torch.nn.CrossEntropyLoss()
+LOSS = torch.nn.BCEWithLogitsLoss()
 IMAGE_SIZE = (512, 512)
-BATCH_SIZE = 16
+BATCH_SIZE = 8
 MODEL_PATH = './models/'
-MODEL_NAME = 'SimpleCNN.pth'
-DATA_PATH = './dogs-vs-cats/train/'
+MODEL_NAME = 'SimpleCNN_aug.pth'
+TRAIN_PATH = './dogs-vs-cats/train/'
 TEST_PATH = './dogs-vs-cats/test1/'
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 print('GPU state:', DEVICE)
 
-# 配置 Logger
-# logging.basicConfig(level=logging.INFO)  # 配置info
-# LOGGER = logging.getLogger(f'{MODEL_NAME}')  #建立一個叫做(f'{MODEL_NAME}')的記錄器
-# LOG_FILE = f'{MODEL_PATH}/{MODEL_NAME}.log' #記錄檔案名稱
-# file_handler = logging.FileHandler(LOG_FILE)
-# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-# file_handler.setFormatter(formatter)
-
 class Image_dataset(Dataset):
-    def __init__(self, data) -> None:
+    def __init__(self, data, data_path, augmentation=False) -> None:
         self.file_name = data[0]
         self.label = data[1]
-        self.transform = transforms.Compose([
-            transforms.Resize(IMAGE_SIZE),
-            transforms.ToTensor()
-        ])
+        self.data_path = data_path
+        if(augmentation):
+            self.transform = transforms.Compose([
+                transforms.Resize(IMAGE_SIZE),
+                transforms.RandomHorizontalFlip(p=0.5),
+                transforms.RandomRotation(5),
+                transforms.ToTensor(),
+            ])
+        else:
+            self.transform = transforms.Compose([
+                transforms.Resize(IMAGE_SIZE),
+                transforms.ToTensor()
+            ])
 
     def __len__(self):
         return len(self.file_name)
 
     def __getitem__(self, index):
-        img_path = os.path.join(DATA_PATH, self.file_name[index])
+        img_path = os.path.join(self.data_path, self.file_name[index])
         img = self.transform(Image.open(img_path).convert("RGB"))
 
         return img, self.label[index]
@@ -61,31 +60,44 @@ def train(train_DataLoader, val_DataLoader, model, scheduler, opt):
         val_batch_tqdm = progress.add_task(description="Val progress", total=len(val_DataLoader))
         for num_epochs in range(EPOCHS):
             train_avg_loss, val_avg_loss = 0, 0
+            train_correct, train_total = 0, 0
+            val_correct, val_total = 0, 0
             model.train()
             for imgs, labels in train_DataLoader:
                 imgs = imgs.to(DEVICE)
+                labels = labels.to(DEVICE).unsqueeze(1).float()
                 outputs = model(imgs)
                 opt.zero_grad()
-                loss = LOSS(outputs, labels.to(DEVICE))
+                loss = LOSS(outputs, labels)
                 loss.backward()
                 opt.step()
                 train_avg_loss += loss.item()
+                preds = (torch.sigmoid(outputs) > 0.5).long()
+                train_correct += (preds == labels.long()).sum().item()
+                train_total += labels.size(0)
+                
                 progress.advance(train_batch_tqdm, advance=1)
             print("Start validation...")
             model.eval()
+
             with torch.no_grad():
                 for val_imgs, val_labels in val_DataLoader:
                     val_imgs = val_imgs.to(DEVICE)
+                    val_labels = val_labels.to(DEVICE).unsqueeze(1).float()
                     val_outputs = model(val_imgs)
-                    val_loss = LOSS(val_outputs, val_labels.to(DEVICE))
+                    val_loss = LOSS(val_outputs, val_labels)
                     val_avg_loss += val_loss.item()
+                    val_preds = (torch.sigmoid(val_outputs) > 0.5).long()
+                    val_correct += (val_preds == val_labels.long()).sum().item()
+                    val_total += val_labels.size(0)
                     progress.advance(val_batch_tqdm, advance=1)
 
             train_avg_loss /= len(train_DataLoader)
             val_avg_loss /= len(val_DataLoader)
+            train_acc = train_correct / train_total
+            val_acc = val_correct / val_total
 
-            # LOGGER.info('Epoch {}: train loss: {} |  val loss : {}'.format(num_epochs ,train_avg_loss, val_avg_loss)) #紀錄訓練資訊
-            print('Epoch {}: train loss: {} |  val loss : {}'.format(num_epochs ,train_avg_loss, val_avg_loss))
+            print('Epoch {}: train loss: {:.4f} | train acc: {:.4f} | val loss: {:.4f} | val acc: {:.4f}'.format(num_epochs, train_avg_loss, train_acc, val_avg_loss, val_acc))
             scheduler.step(val_avg_loss)
             if best_loss > val_avg_loss:
                 print("Model saving...")
@@ -105,14 +117,16 @@ def train(train_DataLoader, val_DataLoader, model, scheduler, opt):
     
 
 if __name__ == '__main__':
-    
-    train_data, val_data = data_split()
+    parser = argparse.ArgumentParser(description='Augmentation or not')
+    parser.add_argument('--augmentation', type=bool, default=False, help='Use augmentation or not')
+    args = parser.parse_args()
+    train_data, val_data = data_split(TRAIN_PATH)
     print(f'Training data: {len(train_data[0])} images')
     print(f'Validation data: {len(val_data[0])} images')
 
-    train_dataset = Image_dataset(train_data)
+    train_dataset = Image_dataset(train_data, TRAIN_PATH, augmentation=args.augmentation)
     train_DataLoader = DataLoader(train_dataset, shuffle=True, batch_size=BATCH_SIZE)
-    val_dataset = Image_dataset(val_data)
+    val_dataset = Image_dataset(val_data, TRAIN_PATH, augmentation=args.augmentation)
     val_DataLoader = DataLoader(val_dataset, shuffle=True, batch_size=BATCH_SIZE)
 
     model = SimpleCNN().to(DEVICE)

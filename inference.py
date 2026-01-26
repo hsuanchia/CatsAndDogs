@@ -1,7 +1,6 @@
-import torch, os, time, csv
+import torch, os, time, csv, argparse
 import numpy as np
 import matplotlib.pyplot as plt
-
 from rich.progress import track
 from PIL import Image
 from torchvision import transforms
@@ -14,7 +13,6 @@ TEST_LABEL_PATH = './dogs-vs-cats/test1_label.csv'
 IMAGE_SIZE = (512, 512)
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 print('GPU state:', DEVICE)
-
 
 class Image_dataset_inference(Dataset):
     def __init__(self, data, data_path, label_path) -> None:
@@ -88,6 +86,21 @@ def inference(test_DataLoader, model):
     # 3. Confusion Matrix
     cm = confusion_matrix(all_labels, all_preds)
     print(f'Confusion Matrix:\n{cm}')
+    plt.figure(figsize=(2,2))
+    plt.imshow(cm, cmap='Blues')
+    plt.colorbar()
+    plt.xticks([i for i in range(2)])
+    plt.yticks([i for i in range(2)])
+
+    thresh = cm.max()/2
+    for i in range(2):
+        for j in range(2):
+            plt.text(j,i,cm[i,j],horizontalalignment='center',color='white' if cm[i,j] > thresh else "black")
+    plt.xlabel("True label")
+    plt.ylabel("Predict label")
+    plt.tight_layout()
+    plt.savefig('./cnf_mat.png', dpi=300, bbox_inches='tight')
+    print('Confusion matrix saved to ./cnf_mat.png')
     
     # 4. ROC Curve
     fpr, tpr, _ = roc_curve(all_labels, all_probs)
@@ -106,36 +119,18 @@ def inference(test_DataLoader, model):
     print(f'ROC AUC: {roc_auc:.4f}')
     print('ROC curve saved to ./roc_curve.png')
 
-def inference_build_csv(test_DataLoader, model):
-    model.eval()
-    results = []
-    
-    with torch.no_grad():
-        for file_names, imgs in track(test_DataLoader):
-            outputs = model(imgs.to(DEVICE))
-            probs = torch.sigmoid(outputs)  # Probability of positive class
-            
-            # preds = (probs > 0.5).long()  # Convert to class 0 or 1
-            for file_name, pred in zip(file_names, probs.cpu().numpy()):
-                results.append((file_name, probs[0]))
-
-    # Save to CSV
-    with open('./predictions.csv', 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(['id', 'label'])
-        for file_name, pred in results:
-            writer.writerow([os.path.splitext(file_name)[0], pred])
-
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Inference for Cats vs Dogs Classification')
+    parser.add_argument('--model_path', type=str, default='./models/SimpleCNN_30ep.pth', help='Path of trained model')
+    args = parser.parse_args()
     test_data = [x for x in os.listdir(TEST_PATH)]
 
     test_dataset = Image_dataset_inference(test_data, TEST_PATH, label_path=TEST_LABEL_PATH)
     test_DataLoader = DataLoader(test_dataset, shuffle=False, batch_size=16)
 
     model = SimpleCNN().to(DEVICE)
-    model.load_state_dict(torch.load('./models/SimpleCNN_30ep.pth'))
+    model.load_state_dict(torch.load(args.model_path))
 
     inference(test_DataLoader, model)
-    # result = inference_build_csv(test_DataLoader, model)
     
 
