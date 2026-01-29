@@ -12,7 +12,7 @@ python ./train.py
 python ./inference.py --model_path='model path of trained model'
 ```
 * Colab version ([Link](https://drive.google.com/drive/folders/1FAFm_mdD7G__4qXRhR1Qfhu01iTz2-lJ?usp=drive_link))
-    * I upload all ingredient up to my google drive in order to train model in colab
+    * I upload all the ingredient up to my google drive in order to training model in colab
     * Run all the blocks in colab to train the model and do the inference
     * Remember to **mount the drive** into colab to ensure data accessment from my google drive 
 # Codes
@@ -34,13 +34,13 @@ CatsAndDogs/
 ```
 # Demo
 * Result  
-<img src="./figures/SimpleCNN_30ep_result.png" width="150">
+<img src="./figures/SimpleCNN_224_result.png" width="150">
 
 * Confusion matrix 
-<img src="./figures/SimpleCNN_30ep_cnf_mat.png" width="200">
+<img src="./figures/SimpleCNN_224_cnf_mat.png" width="200">
 
 * ROC curve 
-<img src="./figures/SimpleCNN_30ep_roc_curve.png" width="400">
+<img src="./figures/SimpleCNN_224_roc_curve.png" width="400">
 
 * Labeling tools 
 <img src="./figures/Labeling_tools.png" width="400">
