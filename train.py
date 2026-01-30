@@ -11,7 +11,7 @@ from data_preprocess import data_split
 EPOCHS = 1000
 LEARNING_RATE = 1e-4
 LOSS = torch.nn.BCEWithLogitsLoss()
-IMAGE_SIZE = (512, 512)
+IMAGE_SIZE = (224, 224)
 BATCH_SIZE = 8
 MODEL_PATH = './models/'
 MODEL_NAME = 'SimpleCNN_aug.pth'
