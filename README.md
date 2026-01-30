@@ -43,13 +43,13 @@ CatsAndDogs/
 ```
 # Demo
 * Result  
-<img src="./figures/SimpleCNN_224_result.png" width="150">
+<img src="./figures/SimpleCNN_224_aug_result.png" width="150">
 
 * Confusion matrix 
-<img src="./figures/SimpleCNN_224_cnf_mat.png" width="200">
+<img src="./figures/SimpleCNN_224_aug_cnf_mat.png" width="200">
 
 * ROC curve 
-<img src="./figures/SimpleCNN_224_roc_curve.png" width="400">
+<img src="./figures/SimpleCNN_224_aug_roc_curve.png" width="400">
 
 * Labeling tools 
 <img src="./figures/Labeling_tools.png" width="400">
