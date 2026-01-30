@@ -10,7 +10,7 @@ from model import SimpleCNN
 
 TEST_PATH = './dogs-vs-cats/test1/'
 TEST_LABEL_PATH = './dogs-vs-cats/test1_label.csv'
-IMAGE_SIZE = (512, 512)
+IMAGE_SIZE = (224, 224)
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 print('GPU state:', DEVICE)
 
@@ -121,7 +121,7 @@ def inference(test_DataLoader, model):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Inference for Cats vs Dogs Classification')
-    parser.add_argument('--model_path', type=str, default='./models/SimpleCNN_30ep.pth', help='Path of trained model')
+    parser.add_argument('--model_path', type=str, default='./models/SimpleCNN_224.pth', help='Path of trained model')
     args = parser.parse_args()
     test_data = [x for x in os.listdir(TEST_PATH)]
 
