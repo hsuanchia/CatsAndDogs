@@ -1,6 +1,15 @@
 # Cats And Dogs classification
 # Dataset
 * [Kaggle public dataset](https://www.kaggle.com/competitions/dogs-vs-cats/data)
+    * Training/test dataset should be place under dogs-vs-cats folder following the file structure below
+    ```text
+    dogs-vs-cats/
+    ├── train/           # Folder containing train/val image dataset
+    |
+    ├── test1/           # Folder containing test image dataset
+    |
+    └── test1_label.csv  # Label of test1 dataset
+    ```
 * test1 dataset has no corresponding label, so I labeling the test1 dataset by myself, labeling result saved in test1_label.csv
 # Run codes
 * train
